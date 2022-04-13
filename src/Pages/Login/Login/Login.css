@@ -1,0 +1,12 @@
+.formContainer {
+  width: max-content;
+  margin: 50px auto;
+}
+.formContainer input {
+  display: block;
+  width: 100%;
+}
+
+.submitBtn {
+  margin-top: 12px;
+}

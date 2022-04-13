@@ -1,18 +1,39 @@
 import React, { useEffect, useRef } from "react";
-import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
+import {
+  useSendPasswordResetEmail,
+  useSignInWithEmailAndPassword,
+} from "react-firebase-hooks/auth";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { auth } from "../../../firebase.init";
+import SocialLogin from "../SocialLogin/SocialLogin";
 import "./Login.css";
 
 const Login = () => {
   const location = useLocation();
   const navigate = useNavigate();
+
+  const [sendPasswordResetEmail, sending, error1] =
+    useSendPasswordResetEmail(auth);
+
   const [signInWithEmailAndPassword, user, loading, error] =
     useSignInWithEmailAndPassword(auth);
+
+  let errorElement;
+
+  if (error) {
+    errorElement = <p className="text-danger">Error: {error?.message}</p>;
+  }
+
   const emailRef = useRef("");
   const passwordRef = useRef("");
 
   const from = location?.state?.from?.pathname || "/";
+
+  const resetPassword = async () => {
+    const email = emailRef.current.value;
+    await sendPasswordResetEmail(email);
+    alert("EMail sended");
+  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -20,9 +41,6 @@ const Login = () => {
     const password = passwordRef.current.value;
 
     signInWithEmailAndPassword(email, password);
-    // if (user) {
-    //   navigate(`/home`);
-    // }
   };
 
   useEffect(() => {
@@ -50,7 +68,8 @@ const Login = () => {
             />
           </div>
           <input className="submitBtn" type="submit" value="Login" />
-          <p className="text-center mt-1">
+          {errorElement && errorElement}
+          <p className="text-center mt-1 mb-1">
             <small>
               {" "}
               New to Genius?{" "}
@@ -59,7 +78,14 @@ const Login = () => {
               </Link>
             </small>
           </p>
+          <p onClick={resetPassword} className="text-center mb-1">
+            <small>
+              Forgot password? <span className="text-primary">Reset Here</span>
+            </small>
+          </p>
         </form>
+
+        <SocialLogin></SocialLogin>
       </div>
     </div>
   );

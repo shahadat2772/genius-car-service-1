@@ -5,8 +5,10 @@ import {
 } from "react-firebase-hooks/auth";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { auth } from "../../../firebase.init";
+import Loading from "../../Shared/Loading/Loading";
 import SocialLogin from "../SocialLogin/SocialLogin";
 import "./Login.css";
+import toast, { Toaster } from "react-hot-toast";
 
 const Login = () => {
   const location = useLocation();
@@ -19,10 +21,15 @@ const Login = () => {
     useSignInWithEmailAndPassword(auth);
 
   let errorElement;
-
   if (error) {
     errorElement = <p className="text-danger">Error: {error?.message}</p>;
   }
+
+  if (loading || sending) {
+    <Loading></Loading>;
+  }
+
+  const notify = () => toast("Here is your toast.");
 
   const emailRef = useRef("");
   const passwordRef = useRef("");
@@ -31,8 +38,12 @@ const Login = () => {
 
   const resetPassword = async () => {
     const email = emailRef.current.value;
-    await sendPasswordResetEmail(email);
-    alert("EMail sended");
+    if (email) {
+      await sendPasswordResetEmail(email);
+      toast("Reset email sended");
+    } else {
+      toast("Please enter Your email");
+    }
   };
 
   const handleSubmit = (event) => {
@@ -84,7 +95,7 @@ const Login = () => {
             </small>
           </p>
         </form>
-
+        <Toaster></Toaster>
         <SocialLogin></SocialLogin>
       </div>
     </div>

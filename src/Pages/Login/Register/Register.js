@@ -1,36 +1,48 @@
 import React, { useRef, useState } from "react";
-import { Link } from "react-router-dom";
-import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  useAuthState,
+  useCreateUserWithEmailAndPassword,
+  useUpdateProfile,
+} from "react-firebase-hooks/auth";
 import { auth } from "../../../firebase.init";
 import SocialLogin from "../SocialLogin/SocialLogin";
+import Loading from "../../Shared/Loading/Loading";
 
 const Register = () => {
   const [createUserWithEmailAndPassword, user, loading, error] =
-    useCreateUserWithEmailAndPassword(auth);
+    useCreateUserWithEmailAndPassword(auth, { sendEmailVerification: true });
+
+  const [updateProfile, updating, updateError] = useUpdateProfile(auth);
+
+  if (updating || loading) {
+    <Loading></Loading>;
+  }
+
+  const [currentUser] = useAuthState(auth);
 
   const [agree, setAgree] = useState(false);
-
   const emailRef = useRef("");
   const passwordRef = useRef("");
-  const confirmPasswordRef = useRef("");
+  const nameRef = useRef("");
 
-  const handleSubmit = (event) => {
+  const navigate = useNavigate();
+
+  if (currentUser) {
+    console.log("user", currentUser);
+  }
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
+    const name = nameRef.current.value;
     const email = emailRef.current.value;
     const password = passwordRef.current.value;
-    const confirmPassword = confirmPasswordRef.current.value;
     // const agree = event.target.terms.checked;
 
-    if (!agree) {
-      alert("Terms and conditions are not checked");
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      console.error("Password did not matched!");
-      return;
-    }
-    createUserWithEmailAndPassword(email, password);
+    await createUserWithEmailAndPassword(email, password);
+    await updateProfile({ displayName: name });
+    console.log("Updated profile");
+    navigate(`/home`);
   };
 
   return (
@@ -38,6 +50,10 @@ const Register = () => {
       <div className="formContainer">
         <h3 className="text-center text-secondary pb-2">Register</h3>
         <form onSubmit={handleSubmit} action="">
+          <div className="input-fields">
+            <label htmlFor="password">Your Name</label>
+            <input ref={nameRef} type="text" name="name" id="name" />
+          </div>
           <div className="input-fields">
             <label htmlFor="email">Enter email</label>
             <input ref={emailRef} type="email" name="email" id="email" />
@@ -51,22 +67,12 @@ const Register = () => {
               id="password"
             />
           </div>
-          <div className="input-fields">
-            <label htmlFor="password">Confirm Password</label>
-            <input
-              ref={confirmPasswordRef}
-              type="password"
-              name="confirmPassword"
-              id="confirmPassword"
-            />
-          </div>
           <div
             className={`d-flex align-items-center mt-1 ${
               agree || "text-danger"
             }`}
           >
             <input
-              ref={confirmPasswordRef}
               type="checkbox"
               name="terms"
               id="checkbox"
@@ -82,6 +88,7 @@ const Register = () => {
             type="submit"
             value="Register"
           />
+
           <p className="text-center mt-1">
             <small>
               {" "}

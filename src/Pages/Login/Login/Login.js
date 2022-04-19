@@ -29,7 +29,7 @@ const Login = () => {
     <Loading></Loading>;
   }
 
-  const notify = () => toast("Here is your toast.");
+  // const notify = () => toast("Here is your toast.");
 
   const emailRef = useRef("");
   const passwordRef = useRef("");

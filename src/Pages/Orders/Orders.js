@@ -48,7 +48,6 @@ const Orders = () => {
         <div>
           <p>
             {order.service}::{order.email}
-            {/* {console.log(order)} */}
           </p>
         </div>
       ))}

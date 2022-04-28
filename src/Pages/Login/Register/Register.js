@@ -8,12 +8,19 @@ import {
 import { auth } from "../../../firebase.init";
 import SocialLogin from "../SocialLogin/SocialLogin";
 import Loading from "../../Shared/Loading/Loading";
+import useToken from "../../../hooks/useToken";
 
 const Register = () => {
+  const navigate = useNavigate();
+
   const [createUserWithEmailAndPassword, user, loading, error] =
     useCreateUserWithEmailAndPassword(auth, { sendEmailVerification: true });
 
+  console.log(error);
+
   const [updateProfile, updating, updateError] = useUpdateProfile(auth);
+
+  const [token] = useToken(user);
 
   let loadingElement;
   if (updating || loading) {
@@ -29,10 +36,9 @@ const Register = () => {
   const passwordRef = useRef("");
   const nameRef = useRef("");
 
-  const navigate = useNavigate();
-
-  if (currentUser) {
+  if (token) {
     console.log("user", currentUser);
+    navigate(`/home`);
   }
 
   const handleSubmit = async (event) => {
@@ -45,7 +51,8 @@ const Register = () => {
     await createUserWithEmailAndPassword(email, password);
     await updateProfile({ displayName: name });
     console.log("Updated profile");
-    navigate(`/home`);
+    // navigate(`/home`);
+    console.log(error);
   };
 
   return (

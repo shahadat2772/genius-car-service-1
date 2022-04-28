@@ -10,16 +10,21 @@ import SocialLogin from "../SocialLogin/SocialLogin";
 import "./Login.css";
 import toast from "react-hot-toast";
 import axios from "axios";
+import useToken from "../../../hooks/useToken";
 
 const Login = () => {
   const location = useLocation();
   const navigate = useNavigate();
+
+  const from = location?.state?.from?.pathname || "/";
 
   const [sendPasswordResetEmail, sending, error1] =
     useSendPasswordResetEmail(auth);
 
   const [signInWithEmailAndPassword, user, loading, error] =
     useSignInWithEmailAndPassword(auth);
+
+  const [token] = useToken(user);
 
   let errorElement;
   if (error) {
@@ -34,11 +39,12 @@ const Login = () => {
   }
 
   // const notify = () => toast("Here is your toast.");
+  if (token) {
+    navigate(from, { replace: true });
+  }
 
   const emailRef = useRef("");
   const passwordRef = useRef("");
-
-  const from = location?.state?.from?.pathname || "/";
 
   const resetPassword = async () => {
     const email = emailRef.current.value;
@@ -56,12 +62,8 @@ const Login = () => {
     const password = passwordRef.current.value;
 
     await signInWithEmailAndPassword(email, password);
-    const { data } = await axios.post(
-      "https://peaceful-cove-33691.herokuapp.com/login",
-      { email }
-    );
-    localStorage.setItem("accessToken", data);
-    navigate(from, { replace: true });
+
+    // navigate(from, { replace: true });
   };
 
   return (

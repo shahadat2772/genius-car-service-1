@@ -9,6 +9,7 @@ import facebook from "../../../images/social/facebook.png";
 import github from "../../../images/social/github.png";
 import "./SocialLogin.css";
 import { useNavigate, useLocation } from "react-router-dom";
+import useToken from "../../../hooks/useToken";
 // import Loading from "../../Shared/Loading/Loading";
 
 const SocialLogin = () => {
@@ -17,6 +18,8 @@ const SocialLogin = () => {
 
   const [signInWithGoogle, user, loading, error] = useSignInWithGoogle(auth);
   const [signInWithGithub, user1, loading1, error1] = useSignInWithGithub(auth);
+
+  const [token] = useToken(user || user1);
 
   const from = location?.state?.from?.pathname || "/";
 
@@ -36,8 +39,8 @@ const SocialLogin = () => {
     );
   }
 
-  if (user || user1) {
-    console.log(user, user1);
+  if (token) {
+    // console.log(user, user1);
     navigate(from, { replace: true });
   }
 

@@ -4,14 +4,14 @@ import "./Service.css";
 
 const Service = ({ service }) => {
   const navigate = useNavigate();
-  const { name, img, price, description, id } = service;
+  const { name, img, price, description, _id } = service;
   return (
     <div className="service-container">
       <img src={img} alt="" />
       <h2>{name}</h2>
       <p>Price: ${price}</p>
       <small>{description}</small>
-      <button onClick={() => navigate(`/serviceDetail/${id}`)}>
+      <button onClick={() => navigate(`/serviceDetail/${_id}`)}>
         Book this Service
       </button>
     </div>

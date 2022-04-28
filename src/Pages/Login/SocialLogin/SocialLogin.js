@@ -8,21 +8,26 @@ import google from "../../../images/social/google.png";
 import facebook from "../../../images/social/facebook.png";
 import github from "../../../images/social/github.png";
 import "./SocialLogin.css";
-import { useNavigate } from "react-router-dom";
-import Loading from "../../Shared/Loading/Loading";
+import { useNavigate, useLocation } from "react-router-dom";
+// import Loading from "../../Shared/Loading/Loading";
 
 const SocialLogin = () => {
+  const location = useLocation();
   const navigate = useNavigate();
 
   const [signInWithGoogle, user, loading, error] = useSignInWithGoogle(auth);
   const [signInWithGithub, user1, loading1, error1] = useSignInWithGithub(auth);
 
-  let errorElement;
+  const from = location?.state?.from?.pathname || "/";
 
+  let loadingElement;
   if (loading || loading1) {
-    return <Loading></Loading>;
+    loadingElement = <p>Loading...</p>;
+  } else {
+    loadingElement = undefined;
   }
 
+  let errorElement;
   if (error || error1) {
     errorElement = (
       <p className="text-danger">
@@ -30,8 +35,10 @@ const SocialLogin = () => {
       </p>
     );
   }
+
   if (user || user1) {
-    navigate(`/home`);
+    console.log(user, user1);
+    navigate(from, { replace: true });
   }
 
   return (
@@ -42,6 +49,7 @@ const SocialLogin = () => {
         <div style={{ height: "1px" }} className="bg-secondary w-50 mx-2"></div>
       </div>
       {errorElement && errorElement}
+      {loadingElement && loadingElement}
       <button
         onClick={() => signInWithGoogle()}
         className="border-0 p-1 px-4 rounded d-block my-1 w-100"

@@ -8,7 +8,8 @@ import { auth } from "../../../firebase.init";
 import Loading from "../../Shared/Loading/Loading";
 import SocialLogin from "../SocialLogin/SocialLogin";
 import "./Login.css";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
+import axios from "axios";
 
 const Login = () => {
   const location = useLocation();
@@ -25,8 +26,11 @@ const Login = () => {
     errorElement = <p className="text-danger">Error: {error?.message}</p>;
   }
 
+  let loadingElement;
   if (loading || sending) {
-    <Loading></Loading>;
+    loadingElement = <p>Loading...</p>;
+  } else {
+    loadingElement = undefined;
   }
 
   // const notify = () => toast("Here is your toast.");
@@ -46,19 +50,19 @@ const Login = () => {
     }
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const email = emailRef.current.value;
     const password = passwordRef.current.value;
 
-    signInWithEmailAndPassword(email, password);
+    await signInWithEmailAndPassword(email, password);
+    const { data } = await axios.post(
+      "https://peaceful-cove-33691.herokuapp.com/login",
+      { email }
+    );
+    localStorage.setItem("accessToken", data);
+    navigate(from, { replace: true });
   };
-
-  useEffect(() => {
-    if (user) {
-      navigate(from, { replace: true });
-    }
-  }, [user]);
 
   return (
     <div className="container">
@@ -80,6 +84,7 @@ const Login = () => {
           </div>
           <input className="submitBtn" type="submit" value="Login" />
           {errorElement && errorElement}
+          {loadingElement && loadingElement}
           <p className="text-center mt-1 mb-1">
             <small>
               {" "}
@@ -95,7 +100,7 @@ const Login = () => {
             </small>
           </p>
         </form>
-        <Toaster></Toaster>
+
         <SocialLogin></SocialLogin>
       </div>
     </div>

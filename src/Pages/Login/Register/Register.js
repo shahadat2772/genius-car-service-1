@@ -15,8 +15,11 @@ const Register = () => {
 
   const [updateProfile, updating, updateError] = useUpdateProfile(auth);
 
+  let loadingElement;
   if (updating || loading) {
-    <Loading></Loading>;
+    loadingElement = <p>Loading...</p>;
+  } else {
+    loadingElement = undefined;
   }
 
   const [currentUser] = useAuthState(auth);
@@ -88,7 +91,7 @@ const Register = () => {
             type="submit"
             value="Register"
           />
-
+          {loadingElement && loadingElement}
           <p className="text-center mt-1">
             <small>
               {" "}
